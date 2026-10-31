@@ -166,6 +166,19 @@ async function enter(r, code) {
   const g = $("#game"); g.classList.remove("hidden"); g.classList.add("role-" + r);
   $("#tbCode").textContent = "ROOM " + code;
   stage = new Stage($("#stageHost"));
+  // Téléphone : le plateau animé est masqué par défaut (le téléphone sert de télécommande,
+  // le plateau passe sur la télé ou le PC). Certains téléphones plantent sinon. Bouton pour l'afficher.
+  const phone = r !== "tv" && matchMedia("(max-width: 900px), (pointer: coarse)").matches;
+  const applyStage = () => {
+    const on = !phone || LS.get("cac-stage") === "on";
+    g.classList.toggle("no-stage", !on);
+    $("#btnStage").classList.toggle("on", on);
+    $("#btnStage").setAttribute("aria-label", on ? "Masquer le plateau" : "Afficher le plateau");
+    if (on) requestAnimationFrame(() => stage?.fit());
+  };
+  $("#btnStage").classList.toggle("hidden", !phone); $("#btnStage").innerHTML = icon("tv");
+  $("#btnStage").onclick = $("#stageOn").onclick = () => { LS.set("cac-stage", g.classList.contains("no-stage") ? "on" : "off"); applyStage(); };
+  applyStage();
   bindPanel();
   setMuteIcon();
   $("#btnFull").innerHTML = icon("full"); $("#btnQuit").innerHTML = icon("close");

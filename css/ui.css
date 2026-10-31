@@ -365,3 +365,12 @@ select option { background: #1d0833; }
 @media (max-width: 900px) { #panel > [data-act=start]:not(:disabled) { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 4; box-shadow: 0 -12px 24px -6px rgba(10,0,22,.9), 0 10px 24px -10px #ff2d86; } }
 /* En jeu : pas de « glisser vers le bas pour rafraîchir » (ça rechargeait la page et renvoyait à l'accueil) */
 html.in-game, html.in-game body { overscroll-behavior: none; }
+/* Téléphone : plateau masqué (le téléphone sert de télécommande) */
+.stage-off { display: none; }
+#game.no-stage #stageHost, #game.no-stage #btnFull { display: none; }
+#game.no-stage .stage-off { display: flex; align-items: center; gap: 10px; flex: none; padding: 8px 12px; font-size: 13.5px; line-height: 1.3; color: var(--mut); background: rgba(0,0,0,.3); border-bottom: 1px solid var(--line); }
+#game.no-stage .stage-off span { flex: 1; }
+#game.no-stage .stage-off .btn { flex: none; }
+#btnStage.on { background: rgba(255,45,134,.22); border-color: #ff2d8688; }
+#game.no-stage .layout { display: flex; flex-direction: column; }
+#game.no-stage #panel { flex: 1; min-height: 0; overflow-y: auto; border-left: 0; }

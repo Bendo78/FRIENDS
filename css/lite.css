@@ -38,6 +38,9 @@
   @keyframes ioSlam { from { opacity: 0; transform: scale(1.8); } to { opacity: 1; transform: none; } }
   @keyframes ioHide { to { opacity: .4; } }
 
+  /* petits avatars du panneau : pas de clignement des yeux (redessin permanent sinon) */
+  #panel .av-eyes { animation: none; }
+
   /* accueil : moins de calques flous en fond */
   .home-air { display: none; }
   .smoke path { filter: none; }

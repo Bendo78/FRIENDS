@@ -89,6 +89,7 @@
       <div class="tb-code" id="tbCode"></div>
       <div class="tb-status" id="tbStatus"></div>
       <div class="tb-actions">
+        <button id="btnStage" class="icon-btn hidden" aria-label="Afficher le plateau"></button>
         <button id="btnMute" class="icon-btn" aria-label="Couper le son"></button>
         <button id="btnFull" class="icon-btn" aria-label="Plein écran"></button>
         <button id="btnQuit" class="icon-btn" aria-label="Quitter"></button>
@@ -96,6 +97,7 @@
     </header>
     <div class="layout">
       <div id="stageHost"></div>
+      <div class="stage-off"><span>Plateau masqué pour que ton téléphone reste fluide. Il passe en grand sur la télé ou le PC.</span><button id="stageOn" type="button" class="btn small">Afficher</button></div>
       <aside id="panel"></aside>
     </div>
     <div id="soundGate" class="sound-gate hidden"><button class="btn primary big">Activer le son et lancer le plateau</button></div>
