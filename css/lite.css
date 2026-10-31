@@ -1,0 +1,44 @@
+/* ─────────────────────────────────────────────────────────────
+   Mode allégé pour téléphones et tablettes.
+   Le plateau complet (grain, brume, fusions de lumière, flous) demande
+   trop de mémoire graphique à certains navigateurs mobiles (Brave,
+   Chrome sur Android d'entrée de gamme) : l'onglet plante et se recharge.
+   Ici on garde le décor, les personnages et les projecteurs, mais sans
+   les effets les plus coûteux. Le grand écran (PC, télé) ne change pas.
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px), (pointer: coarse) {
+  /* calques plein écran animés : les plus gourmands */
+  .stage .grain, .stage .grade, .stage .haze, .stage .flare, .stage .st-embers, .stage .led-grid { display: none !important; }
+  .cam { will-change: auto; }
+  /* les 108 ampoules du cadre clignotaient chacune : un calque par ampoule. Ici elles restent allumées. */
+  .stage .bulb, .stage.party .bulb { animation: none; box-shadow: none; }
+  /* sol quadrillé en 3D avec masque : gros calque, on le retire */
+  .stage .floor-grid { display: none; }
+
+  /* lumières : pas de mélange de calques ni de flou */
+  .stage .key, .stage .pool { mix-blend-mode: normal; }
+  .stage .key.on { opacity: .35; } .stage .key.weak { opacity: .2; }
+  .stage .pool.on { opacity: .55; } .stage .pool.weak { opacity: .3; }
+  .stage .cone { filter: none; opacity: .45; }
+  .stage .cone::before { display: none; }
+
+  /* flous et ombres portées : remplacés par un simple assombrissement */
+  .stage .audience, .stage .duo.far { filter: none; }
+  .stage.dimmed .duo:not(.focus) { filter: brightness(.8); }
+  .stage .anchor-av .av, .stage .sofa-back, .stage .riser, .stage .duo-heart, .stage .led-heart path, .stage .obj-burst, .stage .riser-rim, .stage .duo.sel .riser-rim { filter: none; }
+  .stage.dimmed .seatpl.lit .av, .stage.dimmed .anchor.lit .av { filter: brightness(1.1); }
+  .stage.dimmed .seatpl.lit-weak .av { filter: none; }
+  .stage .st-embers i, .stage .lamp { box-shadow: none; }
+
+  /* générique : mêmes animations, sans flou ni fumée */
+  .intro .io-smoke, .intro .io-embers { display: none; }
+  .intro .is.on::before { filter: none; }
+  .intro .io-coal, .intro .io-ring .fg, .intro .io-obj svg { filter: none; }
+  @keyframes ioIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+  @keyframes ioSlam { from { opacity: 0; transform: scale(1.8); } to { opacity: 1; transform: none; } }
+  @keyframes ioHide { to { opacity: .4; } }
+
+  /* accueil : moins de calques flous en fond */
+  .home-air { display: none; }
+  .smoke path { filter: none; }
+}
