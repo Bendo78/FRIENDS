@@ -15,6 +15,8 @@ const LS = {
   get(k, d = null) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
+// Copie de l'état (JSON simple) : marche aussi sur les iPhone qui n'ont pas structuredClone
+const clone = (o) => JSON.parse(JSON.stringify(o));
 const SS = {
   get(k, d = null) { try { const v = sessionStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch {} },
@@ -191,7 +193,7 @@ async function startHost(resume) {
   setInterval(broadcast, 3000);
 }
 function publicState() {
-  const s = structuredClone(S);
+  const s = clone(S);
   if (s.round) {
     if (s.phase !== "verdict") delete s.round.expected;
     if (s.phase === "question" || s.phase === "secret") delete s.round.answer;
@@ -440,7 +442,7 @@ function onMsg(m) {
 function render() {
   const prev = lastS;
   if (S) {
-    lastS = structuredClone(S);
+    lastS = clone(S);
     effects(prev, S);
     stage.update(S, { me: role === "player" ? pid : null, showCode: role === "tv" || S.phase === "lobby" });
   }
@@ -686,8 +688,10 @@ function hostView() {
       }).join("")}</div>`).join("")}</div>
       <p class="mut">Les candidats choisissent leur place eux-mêmes ; tu peux aussi les placer ici.</p></section>
       <section class="box"><h3>${icon("users")}Candidats</h3><div class="plist">${P.length ? P.map((p) => `<div class="pitem"><span class="mini-av">${avatarSVG(p.look, { pose: "sit" })}</span>${esc(p.name)} <span class="mut">${p.duo != null ? `Duo ${p.duo + 1}` : "debout"}</span><button class="x" data-act="kick" data-v="${p.id}" aria-label="Retirer ${esc(p.name)}">${icon("x")}</button></div>`).join("") : `<p class="mut">Personne pour l'instant. Partage le lien ci-dessus.</p>`}</div></section>
-      <button class="btn primary big" data-act="start" ${full ? "" : "disabled"}>${btnIc("play", "Lancer l'émission")}</button>
-      ${full ? "" : `<p class="mut center">Il faut au moins un duo complet sur un canapé.</p>`}`;
+      <button class="btn primary big" data-act="start" ${full ? "" : "disabled"}>${btnIc("play", full ? "Lancer l'émission" : P.length ? "En attente d'un duo complet" : "En attente des candidats")}</button>
+      ${full ? "" : `<p class="start-why">${P.length
+        ? `<b>${P.length} connecté${P.length > 1 ? "s" : ""}, ${P.filter((p) => p.duo != null).length} assis.</b> Il faut 2 candidats assis sur le <b>même canapé</b> pour lancer.`
+        : `<b>Personne n'a encore rejoint.</b> Envoie le lien ou le code ${esc(S.code)} à tes potes : il faut au moins 2 candidats assis sur le même canapé pour lancer.`}</p>`}`;
   } else if (S.phase === "intro") {
     html += `<section class="box"><h3>${icon("play")}Générique en cours</h3><p class="mut">La vidéo des règles passe sur le plateau et sur les téléphones. Ensuite, tu choisis le premier candidat à interroger.</p></section>
       <button class="btn primary big" data-act="endIntro">${btnIc("next", "Passer les règles")}</button>`;

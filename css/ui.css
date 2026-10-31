@@ -358,3 +358,6 @@ select option { background: #1d0833; }
   #game.role-tv .layout { grid-template-columns: 1fr; }
   #game.role-tv #stageHost { height: 100dvh; }
 }
+.start-why { margin: 0; padding: 10px 12px; border-radius: 12px; background: rgba(255,179,71,.1); border: 1px solid rgba(255,179,71,.3); color: #ffe2b0; font-size: 15px; text-align: center; text-wrap: balance; }
+.start-why b { color: #fff; }
+@media (max-width: 900px) { #panel > [data-act=start]:not(:disabled) { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 4; box-shadow: 0 -12px 24px -6px rgba(10,0,22,.9), 0 10px 24px -10px #ff2d86; } }
