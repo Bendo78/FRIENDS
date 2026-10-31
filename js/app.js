@@ -122,6 +122,12 @@ function initHome() {
   if (again && (!r || r.toUpperCase() === again.code) && myName) {
     if (again.role === "player") return void startPlayer(again.code);
     if (again.role === "co") return void startCo(again.code);
+    // Le présentateur revient sur son émission (page rechargée par erreur, onglet relancé par le téléphone…)
+    // Garde-fou : deux rechargements en moins de 20 s, on reste sur l'accueil pour ne pas boucler.
+    if (again.role === "host" && LS.get("cac-host-" + again.code)) {
+      const now = Date.now();
+      if (now - SS.get("cac-resumeAt", 0) > 20000) { SS.set("cac-resumeAt", now); return void startHost(again.code); }
+    }
   }
   const last = LS.get("cac-lasthost");
   if (last && LS.get("cac-host-" + last)) {
@@ -155,6 +161,7 @@ function setMuteIcon() { $("#btnMute").innerHTML = icon(isMuted() ? "mute" : "so
 
 async function enter(r, code) {
   role = r;
+  document.documentElement.classList.add("in-game"); // bloque le « glisser pour rafraîchir » du téléphone
   $("#home").classList.add("hidden");
   const g = $("#game"); g.classList.remove("hidden"); g.classList.add("role-" + r);
   $("#tbCode").textContent = "ROOM " + code;
@@ -187,6 +194,7 @@ async function startHost(resume) {
   if (!H.data) H.form.src = "bank";
   if (S.phase === "question" && S.round && !S.round.submitted) S.round.endsAt = Date.now() + S.round.timer * 1000;
   LS.set("cac-lasthost", code);
+  SS.set("cac-session", { role: "host", code });
   await enter("host", code);
   commit();
   setInterval(hostTick, 200);
@@ -507,7 +515,9 @@ function loop() {
     const i = stage.intro(Date.now() + offset - (S.introAt || 0));
     if (i !== introIdx) { introIdx = i; introSound(i); }
   } else introIdx = -1;
-  document.querySelectorAll("[data-timer]").forEach((e) => { e.textContent = rem == null ? "" : Math.max(0, Math.ceil(rem)) + " s"; e.classList.toggle("hurry", rem != null && rem <= 5); });
+  // on ne touche au texte que s'il change (sinon le téléphone redessine 60 fois par seconde)
+  const tTxt = rem == null ? "" : Math.max(0, Math.ceil(rem)) + " s", tHurry = rem != null && rem <= 5;
+  document.querySelectorAll("[data-timer]").forEach((e) => { if (e.textContent !== tTxt) e.textContent = tTxt; if (e.classList.contains("hurry") !== tHurry) e.classList.toggle("hurry", tHurry); });
   if (role === "player" && rem != null && rem <= 0 && target()?.id === pid && mySubmitN !== R.n) {
     mySubmitN = R.n; send({ t: "submit", text: myDraft }); panelKey = ""; renderPanel();
   }

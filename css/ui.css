@@ -151,11 +151,13 @@ select option { background: #1d0833; }
 #game.role-tv #panel, #game.role-tv .topbar { display: none; }
 #game.role-tv #stageHost { height: 100dvh; }
 
+/* Téléphone : la page ne défile pas. Le plateau reste fixe en haut et seul le panneau défile,
+   sinon le navigateur recompose tout le plateau à chaque mouvement du doigt (et certains plantent). */
 @media (max-width: 900px) {
-  #game { height: auto; min-height: 100dvh; }
-  .layout { display: flex; flex-direction: column; }
-  #stageHost { width: 100%; height: min(56.25vw, 42vh); flex: none; position: sticky; top: 0; z-index: 5; box-shadow: 0 10px 20px rgba(0,0,0,.5); }
-  #panel { border-left: 0; overflow: visible; }
+  #game { height: 100dvh; overflow: hidden; }
+  .layout { display: flex; flex-direction: column; min-height: 0; }
+  #stageHost { width: 100%; height: min(56.25vw, 40dvh); flex: none; position: relative; z-index: 5; box-shadow: 0 10px 20px rgba(0,0,0,.5); overflow: hidden; contain: strict; }
+  #panel { border-left: 0; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
   .tb-logo { display: none; }
   .tb-status span { display: none; }
   #game.role-tv #stageHost { aspect-ratio: auto; height: 100dvh; position: static; }
@@ -317,8 +319,8 @@ select option { background: #1d0833; }
   #panel { padding: 12px 12px calc(18px + env(safe-area-inset-bottom)); }
   /* le bouton « Lancer la question » reste sous le pouce pendant qu'on règle la question */
   #panel > [data-act=launch][data-v="0"]:not(:disabled) { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 4; box-shadow: 0 -12px 24px -6px rgba(10,0,22,.9), 0 10px 24px -10px #ff2d86; }
-  /* clavier ouvert : le plateau ne reste plus collé en haut, pour laisser voir ce qu'on écrit */
-  #game:has(#panel textarea:focus, #panel input:focus) #stageHost { position: relative; }
+  /* clavier ouvert : le plateau rapetisse pour laisser voir ce qu'on écrit */
+  #game:has(#panel textarea:focus, #panel input:focus) #stageHost { height: min(32vw, 20dvh); }
   /* 16 px minimum : sinon l'iPhone zoome tout seul sur le champ */
   input, textarea, select, .num, #msgIn, .seat-duo select, .who-grid select, .share input { font-size: 16px; }
   .home-hero { margin-bottom: 20px; }
@@ -348,8 +350,8 @@ select option { background: #1d0833; }
 /* téléphone à l'horizontale : plateau à gauche, commandes à droite */
 @media (max-width: 950px) and (orientation: landscape) and (max-height: 560px) {
   #game { height: 100dvh; min-height: 0; }
-  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 40%); }
-  #stageHost { position: static; height: auto; box-shadow: none; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 40%); grid-template-rows: minmax(0, 1fr); }
+  #stageHost { position: static; height: auto; box-shadow: none; contain: layout paint; }
   #game:has(#panel textarea:focus, #panel input:focus) #stageHost { height: auto; }
   #panel { overflow-y: auto; border-left: 1px solid var(--line); padding: 10px 10px calc(14px + env(safe-area-inset-bottom)); }
   .topbar { padding: 2px 10px; padding-left: max(10px, env(safe-area-inset-left)); }
@@ -361,3 +363,5 @@ select option { background: #1d0833; }
 .start-why { margin: 0; padding: 10px 12px; border-radius: 12px; background: rgba(255,179,71,.1); border: 1px solid rgba(255,179,71,.3); color: #ffe2b0; font-size: 15px; text-align: center; text-wrap: balance; }
 .start-why b { color: #fff; }
 @media (max-width: 900px) { #panel > [data-act=start]:not(:disabled) { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 4; box-shadow: 0 -12px 24px -6px rgba(10,0,22,.9), 0 10px 24px -10px #ff2d86; } }
+/* En jeu : pas de « glisser vers le bas pour rafraîchir » (ça rechargeait la page et renvoyait à l'accueil) */
+html.in-game, html.in-game body { overscroll-behavior: none; }

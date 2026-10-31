@@ -444,7 +444,7 @@ export class Stage {
     if (remaining == null) { t.classList.remove("show"); this.lastSec = null; return false; }
     t.classList.add("show");
     const r = Math.max(0, remaining), sec = Math.ceil(r), C = 2 * Math.PI * 52;
-    t.querySelector("b").textContent = sec;
+    if (this.lastSec !== sec) t.querySelector("b").textContent = sec;
     const fg = t.querySelector(".tr-fg");
     fg.style.strokeDasharray = C; fg.style.strokeDashoffset = C * (1 - r / total);
     t.classList.toggle("hurry", r <= 5);
