@@ -1,3 +1,4 @@
+import { log, lastReport } from "./journal.js"; // en premier : note aussi les erreurs de chargement
 import { connect, isOnline } from "./net.js";
 import { Stage } from "./stage.js";
 import { INTRO, INTRO_TOTAL } from "./intro.js";
@@ -96,6 +97,19 @@ function applyLookAct(look, d) {
 // ───────────────────────── accueil ─────────────────────────
 function initHome() {
   document.querySelectorAll("[data-ic]").forEach((b) => (b.innerHTML = btnIc(b.dataset.ic, b.textContent)));
+  // La page s'est fermée ou rechargée toute seule la dernière fois : on montre le rapport
+  const report = lastReport();
+  if (report) {
+    const box = $("#crashBox");
+    box.querySelector("h2").textContent = report.crashed ? "Le jeu s'est fermé tout seul la dernière fois" : "La page a été rechargée";
+    box.querySelector("pre").textContent = report.text;
+    box.classList.remove("hidden");
+    box.querySelector("[data-copy]").onclick = async () => {
+      try { await navigator.clipboard.writeText(report.text); toast("Rapport copié : colle-le dans le chat"); }
+      catch { const r = document.createRange(); r.selectNodeContents(box.querySelector("pre")); getSelection().removeAllRanges(); getSelection().addRange(r); toast("Texte sélectionné : fais « Copier »"); }
+    };
+    box.querySelector("[data-close]").onclick = () => box.classList.add("hidden");
+  }
   const mode = $("#netMode");
   if (isOnline()) { mode.innerHTML = `<i class="dot on"></i>En ligne — jouable depuis n'importe où`; mode.classList.add("on"); }
   else { mode.innerHTML = `<i class="dot local"></i>Mode local — seulement entre onglets de ce navigateur (configure Supabase pour jouer en ligne)`; mode.classList.add("off"); }
@@ -119,9 +133,10 @@ function initHome() {
 
   // Rechargement de page : on remet chacun à sa place
   const again = SS.get("cac-session");
-  if (again && (!r || r.toUpperCase() === again.code) && myName) {
-    if (again.role === "player") return void startPlayer(again.code);
-    if (again.role === "co") return void startCo(again.code);
+  // (après une fermeture brutale on reste sur l'accueil, pour montrer le rapport)
+  if (again && (!r || r.toUpperCase() === again.code) && !report?.crashed) {
+    if (again.role === "player" && myName) return void startPlayer(again.code);
+    if (again.role === "co" && myName) return void startCo(again.code);
     // Le présentateur revient sur son émission (page rechargée par erreur, onglet relancé par le téléphone…)
     // Garde-fou : deux rechargements en moins de 20 s, on reste sur l'accueil pour ne pas boucler.
     if (again.role === "host" && LS.get("cac-host-" + again.code)) {
@@ -161,6 +176,7 @@ function setMuteIcon() { $("#btnMute").innerHTML = icon(isMuted() ? "mute" : "so
 
 async function enter(r, code) {
   role = r;
+  log("entre en jeu", `${r} ${code}`);
   document.documentElement.classList.add("in-game"); // bloque le « glisser pour rafraîchir » du téléphone
   $("#home").classList.add("hidden");
   const g = $("#game"); g.classList.remove("hidden"); g.classList.add("role-" + r);
@@ -462,6 +478,7 @@ function onMsg(m) {
 // ───────────────────────── rendu + effets ─────────────────────────
 function render() {
   const prev = lastS;
+  if (S && S.phase !== prev?.phase) log("phase", S.phase);
   if (S) {
     lastS = clone(S);
     effects(prev, S);

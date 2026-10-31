@@ -374,3 +374,7 @@ html.in-game, html.in-game body { overscroll-behavior: none; }
 #btnStage.on { background: rgba(255,45,134,.22); border-color: #ff2d8688; }
 #game.no-stage .layout { display: flex; flex-direction: column; }
 #game.no-stage #panel { flex: 1; min-height: 0; overflow-y: auto; border-left: 0; }
+/* Rapport après une fermeture inattendue */
+.crash-box { margin: 0 0 20px; padding: 16px; border-radius: 18px; background: rgba(229,41,74,.12); border: 1px solid rgba(255,120,140,.45); display: flex; flex-direction: column; gap: 10px; }
+.crash-box h2 { font-size: 20px; color: #ffc2cc; }
+.crash-box pre { margin: 0; max-height: 260px; overflow: auto; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.4); font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap; word-break: break-word; color: #f3e6ee; user-select: text; }
